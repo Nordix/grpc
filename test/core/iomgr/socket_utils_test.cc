@@ -30,6 +30,7 @@
 #include <grpc/support/log.h>
 #include <grpc/support/sync.h>
 
+#include "src/core/lib/channel/channel_args.h"
 #include "src/core/lib/gpr/useful.h"
 #include "src/core/lib/iomgr/socket_mutator.h"
 #include "src/core/lib/iomgr/socket_utils_posix.h"
@@ -133,6 +134,35 @@ static void test_with_vtable(const grpc_socket_mutator_vtable* vtable) {
   GRPC_ERROR_UNREF(err);
 }
 
+static void test_set_tos_traffic_class() {
+  int optval;
+  socklen_t optlen = sizeof(optval);
+
+  int sock = socket(PF_INET, SOCK_STREAM, 0);
+  GPR_ASSERT(sock > 0);
+
+  // Verify initial TOS value and that IPv6 (IPV6_TCLASS) is not available,
+  // making sure we cover the special handling when IPv6 is not available.
+  GPR_ASSERT(getsockopt(sock, IPPROTO_IP, IP_TOS, &optval, &optlen) == 0);
+  GPR_ASSERT(optval != 32);
+  GPR_ASSERT(getsockopt(sock, IPPROTO_IPV6, IPV6_TCLASS, &optval, &optlen) ==
+             -1);
+
+  grpc_arg arg = grpc_channel_arg_integer_create(
+      const_cast<char*>(GRPC_ARG_IP_TOS_TRAFFIC_CLASS), 32);
+  grpc_channel_args args = {1, &arg};
+
+  GPR_ASSERT(
+      GRPC_LOG_IF_ERROR("set_socket_ip_tos_traffic_class",
+                        grpc_set_socket_ip_tos_traffic_class(sock, &args)));
+
+  // Verify that value was changed
+  GPR_ASSERT(getsockopt(sock, IPPROTO_IP, IP_TOS, &optval, &optlen) == 0);
+  GPR_ASSERT(optval == 32);
+
+  close(sock);
+}
+
 int main(int argc, char** argv) {
   int sock;
   grpc::testing::TestEnvironment env(argc, argv);
@@ -159,6 +189,8 @@ int main(int argc, char** argv) {
 
   test_with_vtable(&mutator_vtable);
   test_with_vtable(&mutator_vtable2);
+
+  test_set_tos_traffic_class();
 
   close(sock);
 

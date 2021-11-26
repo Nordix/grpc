@@ -387,6 +387,34 @@ grpc_error_handle grpc_set_socket_tcp_user_timeout(
   return GRPC_ERROR_NONE;
 }
 
+/* Set IP_TOS and IPV6_TCLASS */
+grpc_error_handle grpc_set_socket_ip_tos_traffic_class(
+    int fd, const grpc_channel_args* channel_args) {
+  if (channel_args != nullptr) {
+    for (size_t i = 0; i < channel_args->num_args; i++) {
+      if (0 ==
+          strcmp(channel_args->args[i].key, GRPC_ARG_IP_TOS_TRAFFIC_CLASS)) {
+        const int value = grpc_channel_arg_get_integer(
+            &channel_args->args[i], grpc_integer_options{-2, -1, 255});
+        if (value < -1) {
+          continue;
+        }
+        if (0 != setsockopt(fd, IPPROTO_IP, IP_TOS, &value, sizeof(value))) {
+          return GRPC_OS_ERROR(errno, "setsockopt(IP_TOS)");
+        }
+        // If IPv6 is not enabled Linux gives ENOPROTOOPT and OSX EINVAL
+        if (0 !=
+            setsockopt(fd, IPPROTO_IPV6, IPV6_TCLASS, &value, sizeof(value))) {
+          if (errno != ENOPROTOOPT && errno != EINVAL) {
+            return GRPC_OS_ERROR(errno, "setsockopt(IPV6_TCLASS)");
+          }
+        }
+      }
+    }
+  }
+  return GRPC_ERROR_NONE;
+}
+
 /* set a socket using a grpc_socket_mutator */
 grpc_error_handle grpc_set_socket_with_mutator(int fd, grpc_fd_usage usage,
                                                grpc_socket_mutator* mutator) {

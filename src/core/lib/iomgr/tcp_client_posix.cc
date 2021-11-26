@@ -83,6 +83,8 @@ static grpc_error_handle prepare_socket(const grpc_resolved_address* addr,
     err = grpc_set_socket_tcp_user_timeout(fd, channel_args,
                                            true /* is_client */);
     if (err != GRPC_ERROR_NONE) goto error;
+    err = grpc_set_socket_ip_tos_traffic_class(fd, channel_args);
+    if (err != GRPC_ERROR_NONE) goto error;
   }
   err = grpc_set_socket_no_sigpipe_if_possible(fd);
   if (err != GRPC_ERROR_NONE) goto error;

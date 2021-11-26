@@ -445,6 +445,9 @@ typedef struct {
     gRPC authorization check. */
 #define GRPC_ARG_AUTHORIZATION_POLICY_PROVIDER \
   "grpc.authorization_policy_provider"
+/* Configure the Type-of-Service/Traffic class used on outgoing packets.
+   Integer value ranging from -1 to 255, where -1 means kernel default. */
+#define GRPC_ARG_IP_TOS_TRAFFIC_CLASS "grpc.ip.tos_traffic_class"
 /** \} */
 
 /** Result of a grpc call. If the caller satisfies the prerequisites of a

@@ -72,6 +72,10 @@ void config_default_tcp_user_timeout(bool enable, int timeout, bool is_client);
 grpc_error_handle grpc_set_socket_tcp_user_timeout(
     int fd, const grpc_channel_args* channel_args, bool is_client);
 
+/* Set IP_TOS and IPV6_TCLASS */
+grpc_error_handle grpc_set_socket_ip_tos_traffic_class(
+    int fd, const grpc_channel_args* channel_args);
+
 /* Returns true if this system can create AF_INET6 sockets bound to ::1.
    The value is probed once, and cached for the life of the process.
 
