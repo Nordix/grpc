@@ -163,6 +163,10 @@ void config_default_tcp_user_timeout(bool enable, int timeout, bool is_client);
 grpc_error_handle grpc_set_socket_tcp_user_timeout(
     int fd, const grpc_core::PosixTcpOptions& options, bool is_client);
 
+/* Set Differentiated Services Code Point (DSCP) */
+grpc_error_handle grpc_set_socket_dscp(int fd,
+                                       const grpc_channel_args* channel_args);
+
 // Returns true if this system can create AF_INET6 sockets bound to ::1.
 // The value is probed once, and cached for the life of the process.
 

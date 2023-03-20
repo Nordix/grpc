@@ -214,6 +214,8 @@ grpc_error_handle grpc_tcp_server_prepare_socket(
     err =
         grpc_set_socket_tcp_user_timeout(fd, s->options, false /* is_client */);
     if (!err.ok()) goto error;
+    err = grpc_set_socket_dscp(fd, s->channel_args);
+    if (err != GRPC_ERROR_NONE) goto error;
   }
   err = grpc_set_socket_no_sigpipe_if_possible(fd);
   if (!err.ok()) goto error;
