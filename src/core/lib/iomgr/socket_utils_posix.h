@@ -49,6 +49,7 @@ struct PosixTcpOptions {
   static constexpr int kMaxChunkSize = 32 * 1024 * 1024;
   static constexpr int kDefaultMaxSends = 4;
   static constexpr size_t kDefaultSendBytesThreshold = 16 * 1024;
+  static constexpr int kDscpDisabled = -1;
   int tcp_read_chunk_size = kDefaultReadChunkSize;
   int tcp_min_read_chunk_size = kDefaultMinReadChunksize;
   int tcp_max_read_chunk_size = kDefaultMaxReadChunksize;
@@ -57,6 +58,7 @@ struct PosixTcpOptions {
   bool tcp_tx_zero_copy_enabled = kZerocpTxEnabledDefault;
   int keep_alive_time_ms = 0;
   int keep_alive_timeout_ms = 0;
+  int dscp = kDscpDisabled;
   bool expand_wildcard_addrs = false;
   bool allow_reuse_port = false;
   RefCountedPtr<ResourceQuota> resource_quota;
@@ -123,6 +125,7 @@ struct PosixTcpOptions {
     keep_alive_timeout_ms = other.keep_alive_timeout_ms;
     expand_wildcard_addrs = other.expand_wildcard_addrs;
     allow_reuse_port = other.allow_reuse_port;
+    dscp = other.dscp;
   }
 };
 
@@ -164,8 +167,8 @@ grpc_error_handle grpc_set_socket_tcp_user_timeout(
     int fd, const grpc_core::PosixTcpOptions& options, bool is_client);
 
 /* Set Differentiated Services Code Point (DSCP) */
-grpc_error_handle grpc_set_socket_dscp(int fd,
-                                       const grpc_channel_args* channel_args);
+grpc_error_handle grpc_set_socket_dscp(
+    int fd, const grpc_core::PosixTcpOptions& options);
 
 // Returns true if this system can create AF_INET6 sockets bound to ::1.
 // The value is probed once, and cached for the life of the process.

@@ -372,41 +372,33 @@ grpc_error_handle grpc_set_socket_tcp_user_timeout(
 }
 
 /* Set Differentiated Services Code Point (DSCP) */
-grpc_error_handle grpc_set_socket_dscp(int fd,
-                                       const grpc_channel_args* channel_args) {
-  if (channel_args != nullptr) {
-    for (size_t i = 0; i < channel_args->num_args; i++) {
-      if (0 == strcmp(channel_args->args[i].key, GRPC_ARG_DSCP)) {
-        int value = grpc_channel_arg_get_integer(
-            &channel_args->args[i], grpc_integer_options{-1, 0, 63});
-        if (value < 0) {
-          continue;
-        }
-        // The TOS/TrafficClass byte consists of following bits:
-        // | 7 6 5 4 3 2 | 1 0 |
-        // |    DSCP     | ECN |
-        value <<= 2;
-        int optval;
-        socklen_t optlen = sizeof(optval);
-        // Get ECN bits from current IP_TOS value unless IPv6 only
-        if (0 == getsockopt(fd, IPPROTO_IP, IP_TOS, &optval, &optlen)) {
-          value |= (optval & 0x3);
-          if (0 != setsockopt(fd, IPPROTO_IP, IP_TOS, &value, sizeof(value))) {
-            return GRPC_OS_ERROR(errno, "setsockopt(IP_TOS)");
-          }
-        }
-        // Get ECN from current Traffic Class value if IPv6 is available
-        if (0 == getsockopt(fd, IPPROTO_IPV6, IPV6_TCLASS, &optval, &optlen)) {
-          value |= (optval & 0x3);
-          if (0 != setsockopt(fd, IPPROTO_IPV6, IPV6_TCLASS, &value,
-                              sizeof(value))) {
-            return GRPC_OS_ERROR(errno, "setsockopt(IPV6_TCLASS)");
-          }
-        }
-      }
+grpc_error_handle grpc_set_socket_dscp(
+    int fd, const grpc_core::PosixTcpOptions& options) {
+  if (options.dscp == grpc_core::PosixTcpOptions::kDscpDisabled) {
+    return absl::OkStatus();
+  }
+  // The TOS/TrafficClass byte consists of following bits:
+  // | 7 6 5 4 3 2 | 1 0 |
+  // |    DSCP     | ECN |
+  int value = options.dscp << 2;
+
+  int optval;
+  socklen_t optlen = sizeof(optval);
+  // Get ECN bits from current IP_TOS value unless IPv6 only
+  if (0 == getsockopt(fd, IPPROTO_IP, IP_TOS, &optval, &optlen)) {
+    value |= (optval & 0x3);
+    if (0 != setsockopt(fd, IPPROTO_IP, IP_TOS, &value, sizeof(value))) {
+      return GRPC_OS_ERROR(errno, "setsockopt(IP_TOS)");
     }
   }
-  return GRPC_ERROR_NONE;
+  // Get ECN from current Traffic Class value if IPv6 is available
+  if (0 == getsockopt(fd, IPPROTO_IPV6, IPV6_TCLASS, &optval, &optlen)) {
+    value |= (optval & 0x3);
+    if (0 != setsockopt(fd, IPPROTO_IPV6, IPV6_TCLASS, &value, sizeof(value))) {
+      return GRPC_OS_ERROR(errno, "setsockopt(IPV6_TCLASS)");
+    }
+  }
+  return absl::OkStatus();
 }
 
 // set a socket using a grpc_socket_mutator

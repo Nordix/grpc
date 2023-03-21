@@ -141,19 +141,22 @@ static void test_set_socket_dscp(int sock, int dscp) {
   // |    DSCP     | ECN |
   int optval;
   socklen_t optlen = sizeof(optval);
-  GPR_ASSERT(getsockopt(sock, IPPROTO_IP, IP_TOS, &optval, &optlen) == 0);
-  GPR_ASSERT((optval >> 2) != dscp);
+  ASSERT_TRUE(getsockopt(sock, IPPROTO_IP, IP_TOS, &optval, &optlen) == 0);
+  ASSERT_TRUE((optval >> 2) != dscp);
 
-  grpc_arg arg =
-      grpc_channel_arg_integer_create(const_cast<char*>(GRPC_ARG_DSCP), dscp);
-  grpc_channel_args args = {1, &arg};
+  // grpc_core::ChannelArgs args;
+  // args = args.Set(GRPC_DSCP, dscp);
+  // ChannelArgsEndpointConfig config(args);
+  // grpc_core::PosixTcpOptions options = TcpOptionsFromEndpointConfig(config);
+  grpc_core::PosixTcpOptions options;
+  options.dscp = dscp;
 
-  GPR_ASSERT(
-      GRPC_LOG_IF_ERROR("set_socket_dscp", grpc_set_socket_dscp(sock, &args)));
+  ASSERT_TRUE(GRPC_LOG_IF_ERROR("set_socket_dscp",
+                                grpc_set_socket_dscp(sock, options)));
 
   // Verify that value was changed
-  GPR_ASSERT(getsockopt(sock, IPPROTO_IP, IP_TOS, &optval, &optlen) == 0);
-  GPR_ASSERT((optval >> 2) == dscp);
+  ASSERT_TRUE(getsockopt(sock, IPPROTO_IP, IP_TOS, &optval, &optlen) == 0);
+  ASSERT_TRUE((optval >> 2) == dscp);
 }
 
 TEST(SocketUtilsTest, MainTest) {
