@@ -131,6 +131,7 @@ absl::Status PrepareTcpClientSocket(PosixSocketWrapper sock,
     GRPC_RETURN_IF_ERROR(sock.SetSocketLowLatency(1));
     GRPC_RETURN_IF_ERROR(sock.SetSocketReuseAddr(1));
     sock.TrySetSocketTcpUserTimeout(options, true);
+    GRPC_RETURN_IF_ERROR(sock.SetSocketDscp(options));
   }
   GRPC_RETURN_IF_ERROR(sock.SetSocketNoSigpipeIfPossible());
   GRPC_RETURN_IF_ERROR(sock.ApplySocketMutatorInOptions(
@@ -179,6 +180,8 @@ PosixTcpOptions TcpOptionsFromEndpointConfig(const EndpointConfig& config) {
   options.expand_wildcard_addrs =
       (AdjustValue(0, 1, INT_MAX,
                    config.GetInt(GRPC_ARG_EXPAND_WILDCARD_ADDRS)) != 0);
+  options.dscp = AdjustValue(PosixTcpOptions::kDscpNotSet, 0, 63,
+                             config.GetInt(GRPC_ARG_DSCP));
   options.allow_reuse_port = PosixSocketWrapper::IsSocketReusePortSupported();
   auto allow_reuse_port_value = config.GetInt(GRPC_ARG_ALLOW_REUSEPORT);
   if (allow_reuse_port_value.has_value()) {
@@ -606,6 +609,39 @@ void PosixSocketWrapper::TrySetSocketTcpUserTimeout(
   }
 }
 
+// Set DSCP
+absl::Status PosixSocketWrapper::SetSocketDscp(const PosixTcpOptions& options) {
+  if (options.dscp == PosixTcpOptions::kDscpNotSet) {
+    return absl::OkStatus();
+  }
+  // The TOS/TrafficClass byte consists of following bits:
+  // | 7 6 5 4 3 2 | 1 0 |
+  // |    DSCP     | ECN |
+  int newval = options.dscp << 2;
+  int val;
+  socklen_t intlen = sizeof(val);
+  // Get ECN bits from current IP_TOS value unless IPv6 only
+  if (0 == getsockopt(fd_, IPPROTO_IP, IP_TOS, &val, &intlen)) {
+    newval |= (val & 0x3);
+    if (0 != setsockopt(fd_, IPPROTO_IP, IP_TOS, &newval, sizeof(newval))) {
+      return absl::Status(
+          absl::StatusCode::kInternal,
+          absl::StrCat("setsockopt(IP_TOS): ", grpc_core::StrError(errno)));
+    }
+  }
+  // Get ECN from current Traffic Class value if IPv6 is available
+  if (0 == getsockopt(fd_, IPPROTO_IPV6, IPV6_TCLASS, &val, &intlen)) {
+    newval |= (val & 0x3);
+    if (0 !=
+        setsockopt(fd_, IPPROTO_IPV6, IPV6_TCLASS, &newval, sizeof(newval))) {
+      return absl::Status(absl::StatusCode::kInternal,
+                          absl::StrCat("setsockopt(IPV6_TCLASS): ",
+                                       grpc_core::StrError(errno)));
+    }
+  }
+  return absl::OkStatus();
+}
+
 // Set a socket using a grpc_socket_mutator
 absl::Status PosixSocketWrapper::SetSocketMutator(
     grpc_fd_usage usage, grpc_socket_mutator* mutator) {
@@ -820,6 +856,11 @@ absl::Status PosixSocketWrapper::SetSocketSndBuf(int /*buffer_size_bytes*/) {
 }
 
 absl::Status PosixSocketWrapper::SetSocketRcvBuf(int /*buffer_size_bytes*/) {
+  grpc_core::Crash("unimplemented");
+}
+
+absl::Status PosixSocketWrapper::SetSocketDscp(
+    const PosixTcpOptions& /*options*/) {
   grpc_core::Crash("unimplemented");
 }
 

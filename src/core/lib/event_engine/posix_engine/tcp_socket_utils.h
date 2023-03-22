@@ -58,6 +58,7 @@ struct PosixTcpOptions {
   static constexpr int kMaxChunkSize = 32 * 1024 * 1024;
   static constexpr int kDefaultMaxSends = 4;
   static constexpr size_t kDefaultSendBytesThreshold = 16 * 1024;
+  static constexpr int kDscpNotSet = -1;
   int tcp_read_chunk_size = kDefaultReadChunkSize;
   int tcp_min_read_chunk_size = kDefaultMinReadChunksize;
   int tcp_max_read_chunk_size = kDefaultMaxReadChunksize;
@@ -68,6 +69,7 @@ struct PosixTcpOptions {
   int keep_alive_timeout_ms = 0;
   bool expand_wildcard_addrs = false;
   bool allow_reuse_port = false;
+  int dscp = kDscpNotSet;
   grpc_core::RefCountedPtr<grpc_core::ResourceQuota> resource_quota;
   struct grpc_socket_mutator* socket_mutator = nullptr;
   PosixTcpOptions() = default;
@@ -132,6 +134,7 @@ struct PosixTcpOptions {
     keep_alive_timeout_ms = other.keep_alive_timeout_ms;
     expand_wildcard_addrs = other.expand_wildcard_addrs;
     allow_reuse_port = other.allow_reuse_port;
+    dscp = other.dscp;
   }
 };
 
@@ -200,6 +203,9 @@ class PosixSocketWrapper {
 
   // Tries to set the socket's receive buffer to given size.
   absl::Status SetSocketRcvBuf(int buffer_size_bytes);
+
+  // Set DSCP
+  absl::Status SetSocketDscp(const PosixTcpOptions& options);
 
   // Tries to set the socket using a grpc_socket_mutator
   absl::Status SetSocketMutator(grpc_fd_usage usage,
