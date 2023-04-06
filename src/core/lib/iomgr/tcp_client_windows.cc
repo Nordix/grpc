@@ -35,6 +35,7 @@
 #include "src/core/lib/gprpp/crash.h"
 #include "src/core/lib/iomgr/event_engine_shims/tcp_client.h"
 #include "src/core/lib/iomgr/iocp_windows.h"
+#include "src/core/lib/iomgr/qos_windows.h"
 #include "src/core/lib/iomgr/sockaddr.h"
 #include "src/core/lib/iomgr/sockaddr_windows.h"
 #include "src/core/lib/iomgr/socket_windows.h"
@@ -206,6 +207,9 @@ static int64_t tcp_connect(grpc_closure* on_done, grpc_endpoint** endpoint,
       goto failure;
     }
   }
+
+  // Set the QoS DSCP if configured.
+  grpc_qos_set_dscp(socket, addr, grpc_qos_get_dscp(config));
 
   ac = new async_connect();
   ac->on_done = on_done;
