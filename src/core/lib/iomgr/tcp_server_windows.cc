@@ -51,6 +51,7 @@
 #include "src/core/lib/iomgr/event_engine_shims/endpoint.h"
 #include "src/core/lib/iomgr/iocp_windows.h"
 #include "src/core/lib/iomgr/pollset_windows.h"
+#include "src/core/lib/iomgr/qos_windows.h"
 #include "src/core/lib/iomgr/resolve_address.h"
 #include "src/core/lib/iomgr/sockaddr.h"
 #include "src/core/lib/iomgr/socket_windows.h"
@@ -123,12 +124,15 @@ struct grpc_tcp_server {
 
   // used for the EventEngine shim
   WindowsEventEngineListener* ee_listener;
+
+  // Endpoint configurations
+  int dscp;
 };
 
 // Public function. Allocates the proper data structures to hold a
 // grpc_tcp_server.
 static grpc_error_handle tcp_server_create(grpc_closure* shutdown_complete,
-                                           const EndpointConfig& /* config */,
+                                           const EndpointConfig& config,
                                            grpc_tcp_server_cb on_accept_cb,
                                            void* on_accept_cb_arg,
                                            grpc_tcp_server** server) {
@@ -143,6 +147,7 @@ static grpc_error_handle tcp_server_create(grpc_closure* shutdown_complete,
   s->shutdown_starting.head = NULL;
   s->shutdown_starting.tail = NULL;
   s->shutdown_complete = shutdown_complete;
+  s->dscp = grpc_qos_get_dscp(config);
   *server = s;
   return absl::OkStatus();
 }
@@ -388,8 +393,9 @@ static void on_accept(void* arg, grpc_error_handle error) {
         gpr_free(utf8_message);
       }
       std::string fd_name = absl::StrCat("tcp_server:", peer_name_string);
-      ep = grpc_tcp_create(grpc_winsocket_create(sock, fd_name.c_str()),
-                           peer_name_string);
+      grpc_winsocket* socket = grpc_winsocket_create(sock, fd_name.c_str());
+      grpc_qos_set_dscp(socket, &peer_name, sp->server->dscp);
+      ep = grpc_tcp_create(socket, peer_name_string);
     } else {
       closesocket(sock);
     }

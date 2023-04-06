@@ -381,7 +381,7 @@
   % endfor
 
   if(WIN32)
-    set(_gRPC_BASELIB_LIBRARIES ws2_32 crypt32)
+    set(_gRPC_BASELIB_LIBRARIES ws2_32 crypt32 qwave.lib)
   endif()
 
   # Create directory for proto source files
