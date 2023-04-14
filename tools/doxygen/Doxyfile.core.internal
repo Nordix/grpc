@@ -795,6 +795,7 @@ doc/interop-test-descriptions.md \
 doc/keepalive.md \
 doc/load-balancing.md \
 doc/naming.md \
+doc/qos-dscp.md \
 doc/security_audit.md \
 doc/server-reflection.md \
 doc/server_reflection_tutorial.md \
@@ -1899,6 +1900,8 @@ src/core/lib/event_engine/windows/windows_engine.cc \
 src/core/lib/event_engine/windows/windows_engine.h \
 src/core/lib/event_engine/windows/windows_listener.cc \
 src/core/lib/event_engine/windows/windows_listener.h \
+src/core/lib/event_engine/windows/windows_qos.cc \
+src/core/lib/event_engine/windows/windows_qos.h \
 src/core/lib/experiments/config.cc \
 src/core/lib/experiments/config.h \
 src/core/lib/experiments/experiments.cc \
@@ -2092,6 +2095,8 @@ src/core/lib/iomgr/pollset_windows.cc \
 src/core/lib/iomgr/pollset_windows.h \
 src/core/lib/iomgr/port.h \
 src/core/lib/iomgr/python_util.h \
+src/core/lib/iomgr/qos_windows.cc \
+src/core/lib/iomgr/qos_windows.h \
 src/core/lib/iomgr/resolve_address.cc \
 src/core/lib/iomgr/resolve_address.h \
 src/core/lib/iomgr/resolve_address_impl.h \

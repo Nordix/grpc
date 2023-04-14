@@ -1465,6 +1465,7 @@ LIBGRPC_SRC = \
     src/core/lib/event_engine/windows/windows_endpoint.cc \
     src/core/lib/event_engine/windows/windows_engine.cc \
     src/core/lib/event_engine/windows/windows_listener.cc \
+    src/core/lib/event_engine/windows/windows_qos.cc \
     src/core/lib/experiments/config.cc \
     src/core/lib/experiments/experiments.cc \
     src/core/lib/gprpp/load_file.cc \
@@ -1521,6 +1522,7 @@ LIBGRPC_SRC = \
     src/core/lib/iomgr/pollset_set.cc \
     src/core/lib/iomgr/pollset_set_windows.cc \
     src/core/lib/iomgr/pollset_windows.cc \
+    src/core/lib/iomgr/qos_windows.cc \
     src/core/lib/iomgr/resolve_address.cc \
     src/core/lib/iomgr/resolve_address_posix.cc \
     src/core/lib/iomgr/resolve_address_windows.cc \
@@ -2009,6 +2011,7 @@ LIBGRPC_UNSECURE_SRC = \
     src/core/lib/event_engine/windows/windows_endpoint.cc \
     src/core/lib/event_engine/windows/windows_engine.cc \
     src/core/lib/event_engine/windows/windows_listener.cc \
+    src/core/lib/event_engine/windows/windows_qos.cc \
     src/core/lib/experiments/config.cc \
     src/core/lib/experiments/experiments.cc \
     src/core/lib/gprpp/load_file.cc \
@@ -2064,6 +2067,7 @@ LIBGRPC_UNSECURE_SRC = \
     src/core/lib/iomgr/pollset_set.cc \
     src/core/lib/iomgr/pollset_set_windows.cc \
     src/core/lib/iomgr/pollset_windows.cc \
+    src/core/lib/iomgr/qos_windows.cc \
     src/core/lib/iomgr/resolve_address.cc \
     src/core/lib/iomgr/resolve_address_posix.cc \
     src/core/lib/iomgr/resolve_address_windows.cc \

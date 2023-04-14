@@ -1107,6 +1107,8 @@
     <file baseinstalldir="/" name="src/core/lib/event_engine/windows/windows_engine.h" role="src" />
     <file baseinstalldir="/" name="src/core/lib/event_engine/windows/windows_listener.cc" role="src" />
     <file baseinstalldir="/" name="src/core/lib/event_engine/windows/windows_listener.h" role="src" />
+    <file baseinstalldir="/" name="src/core/lib/event_engine/windows/windows_qos.cc" role="src" />
+    <file baseinstalldir="/" name="src/core/lib/event_engine/windows/windows_qos.h" role="src" />
     <file baseinstalldir="/" name="src/core/lib/experiments/config.cc" role="src" />
     <file baseinstalldir="/" name="src/core/lib/experiments/config.h" role="src" />
     <file baseinstalldir="/" name="src/core/lib/experiments/experiments.cc" role="src" />
@@ -1297,6 +1299,8 @@
     <file baseinstalldir="/" name="src/core/lib/iomgr/pollset_windows.h" role="src" />
     <file baseinstalldir="/" name="src/core/lib/iomgr/port.h" role="src" />
     <file baseinstalldir="/" name="src/core/lib/iomgr/python_util.h" role="src" />
+    <file baseinstalldir="/" name="src/core/lib/iomgr/qos_windows.cc" role="src" />
+    <file baseinstalldir="/" name="src/core/lib/iomgr/qos_windows.h" role="src" />
     <file baseinstalldir="/" name="src/core/lib/iomgr/resolve_address.cc" role="src" />
     <file baseinstalldir="/" name="src/core/lib/iomgr/resolve_address.h" role="src" />
     <file baseinstalldir="/" name="src/core/lib/iomgr/resolve_address_impl.h" role="src" />
