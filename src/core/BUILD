@@ -1978,6 +1978,7 @@ grpc_cc_library(
         "windows_endpoint",
         "windows_event_engine_listener",
         "windows_iocp",
+        "windows_qos",
         "//:event_engine_base_hdrs",
         "//:gpr",
     ],
@@ -2061,6 +2062,23 @@ grpc_cc_library(
         "event_engine_trace",
         "windows_endpoint",
         "windows_iocp",
+        "windows_qos",
+        "//:event_engine_base_hdrs",
+        "//:gpr",
+        "//:gpr_platform",
+    ],
+)
+
+grpc_cc_library(
+    name = "windows_qos",
+    srcs = [
+        "lib/event_engine/windows/windows_qos.cc",
+    ],
+    hdrs = [
+        "lib/event_engine/windows/windows_qos.h",
+    ],
+    deps = [
+        "error",
         "//:event_engine_base_hdrs",
         "//:gpr",
         "//:gpr_platform",

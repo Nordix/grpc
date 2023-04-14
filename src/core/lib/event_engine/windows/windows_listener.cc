@@ -24,6 +24,7 @@
 #include "src/core/lib/event_engine/windows/win_socket.h"
 #include "src/core/lib/event_engine/windows/windows_endpoint.h"
 #include "src/core/lib/event_engine/windows/windows_listener.h"
+#include "src/core/lib/event_engine/windows/windows_qos.h"
 #include "src/core/lib/gprpp/crash.h"
 #include "src/core/lib/gprpp/sync.h"
 #include "src/core/lib/iomgr/error.h"
@@ -197,6 +198,9 @@ void WindowsEventEngineListener::SinglePortSocketListener::
   } else {
     peer_name = *addr_uri;
   }
+  SetDscpIfConfigured(io_state_->accept_socket, peer_address,
+                      listener_->config_);
+
   auto endpoint = std::make_unique<WindowsEndpoint>(
       peer_address, listener_->iocp_->Watch(io_state_->accept_socket),
       listener_->memory_allocator_factory_->CreateMemoryAllocator(

@@ -38,6 +38,7 @@
 #include "src/core/lib/event_engine/windows/windows_endpoint.h"
 #include "src/core/lib/event_engine/windows/windows_engine.h"
 #include "src/core/lib/event_engine/windows/windows_listener.h"
+#include "src/core/lib/event_engine/windows/windows_qos.h"
 #include "src/core/lib/gprpp/crash.h"
 #include "src/core/lib/gprpp/sync.h"
 #include "src/core/lib/gprpp/time.h"
@@ -232,9 +233,8 @@ void WindowsEventEngine::OnConnectCompleted(
 
 EventEngine::ConnectionHandle WindowsEventEngine::Connect(
     OnConnectCallback on_connect, const ResolvedAddress& addr,
-    const EndpointConfig& /* args */, MemoryAllocator memory_allocator,
+    const EndpointConfig& config, MemoryAllocator memory_allocator,
     Duration timeout) {
-  // TODO(hork): utilize the endpoint config
   absl::Status status;
   int istatus;
   auto uri = ResolvedAddressToURI(addr);
@@ -315,6 +315,8 @@ EventEngine::ConnectionHandle WindowsEventEngine::Connect(
     }
   }
   GPR_ASSERT(watched_socket != nullptr);
+  SetDscpIfConfigured(watched_socket->raw_socket(), address, config);
+
   auto connection_state = std::make_shared<ConnectionState>();
   grpc_core::MutexLock lock(&connection_state->mu);
   connection_state->address = address;
