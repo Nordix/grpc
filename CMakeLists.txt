@@ -410,7 +410,7 @@ if (NOT EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/third_party/xds)
 endif()
 
 if(WIN32)
-  set(_gRPC_BASELIB_LIBRARIES ws2_32 crypt32)
+  set(_gRPC_BASELIB_LIBRARIES ws2_32 crypt32 qwave.lib)
 endif()
 
 # Create directory for proto source files
@@ -2094,6 +2094,7 @@ add_library(grpc
   src/core/lib/event_engine/windows/windows_endpoint.cc
   src/core/lib/event_engine/windows/windows_engine.cc
   src/core/lib/event_engine/windows/windows_listener.cc
+  src/core/lib/event_engine/windows/windows_qos.cc
   src/core/lib/event_engine/work_queue/basic_work_queue.cc
   src/core/lib/experiments/config.cc
   src/core/lib/experiments/experiments.cc
@@ -2152,6 +2153,7 @@ add_library(grpc
   src/core/lib/iomgr/pollset_set.cc
   src/core/lib/iomgr/pollset_set_windows.cc
   src/core/lib/iomgr/pollset_windows.cc
+  src/core/lib/iomgr/qos_windows.cc
   src/core/lib/iomgr/resolve_address.cc
   src/core/lib/iomgr/resolve_address_posix.cc
   src/core/lib/iomgr/resolve_address_windows.cc
@@ -2796,6 +2798,7 @@ add_library(grpc_unsecure
   src/core/lib/event_engine/windows/windows_endpoint.cc
   src/core/lib/event_engine/windows/windows_engine.cc
   src/core/lib/event_engine/windows/windows_listener.cc
+  src/core/lib/event_engine/windows/windows_qos.cc
   src/core/lib/event_engine/work_queue/basic_work_queue.cc
   src/core/lib/experiments/config.cc
   src/core/lib/experiments/experiments.cc
@@ -2853,6 +2856,7 @@ add_library(grpc_unsecure
   src/core/lib/iomgr/pollset_set.cc
   src/core/lib/iomgr/pollset_set_windows.cc
   src/core/lib/iomgr/pollset_windows.cc
+  src/core/lib/iomgr/qos_windows.cc
   src/core/lib/iomgr/resolve_address.cc
   src/core/lib/iomgr/resolve_address_posix.cc
   src/core/lib/iomgr/resolve_address_windows.cc
@@ -4330,6 +4334,7 @@ add_library(grpc_authorization_provider
   src/core/lib/event_engine/windows/windows_endpoint.cc
   src/core/lib/event_engine/windows/windows_engine.cc
   src/core/lib/event_engine/windows/windows_listener.cc
+  src/core/lib/event_engine/windows/windows_qos.cc
   src/core/lib/event_engine/work_queue/basic_work_queue.cc
   src/core/lib/experiments/config.cc
   src/core/lib/experiments/experiments.cc
@@ -4384,6 +4389,7 @@ add_library(grpc_authorization_provider
   src/core/lib/iomgr/pollset_set.cc
   src/core/lib/iomgr/pollset_set_windows.cc
   src/core/lib/iomgr/pollset_windows.cc
+  src/core/lib/iomgr/qos_windows.cc
   src/core/lib/iomgr/resolve_address.cc
   src/core/lib/iomgr/resolve_address_posix.cc
   src/core/lib/iomgr/resolve_address_windows.cc
@@ -11565,6 +11571,7 @@ add_executable(frame_test
   src/core/lib/event_engine/windows/windows_endpoint.cc
   src/core/lib/event_engine/windows/windows_engine.cc
   src/core/lib/event_engine/windows/windows_listener.cc
+  src/core/lib/event_engine/windows/windows_qos.cc
   src/core/lib/event_engine/work_queue/basic_work_queue.cc
   src/core/lib/experiments/config.cc
   src/core/lib/experiments/experiments.cc
@@ -11619,6 +11626,7 @@ add_executable(frame_test
   src/core/lib/iomgr/pollset_set.cc
   src/core/lib/iomgr/pollset_set_windows.cc
   src/core/lib/iomgr/pollset_windows.cc
+  src/core/lib/iomgr/qos_windows.cc
   src/core/lib/iomgr/resolve_address.cc
   src/core/lib/iomgr/resolve_address_posix.cc
   src/core/lib/iomgr/resolve_address_windows.cc
