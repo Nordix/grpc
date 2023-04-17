@@ -18,12 +18,6 @@
 
 #include "src/core/lib/experiments/experiments.h"
 
-#ifdef USE_EVENT_ENGINE
-#define ENABLE_EVENT_ENGINE true
-#else
-#define ENABLE_EVENT_ENGINE false
-#endif
-
 #ifndef GRPC_EXPERIMENTS_ARE_FINAL
 namespace {
 const char* const description_tcp_frame_size_tuning =
@@ -77,8 +71,7 @@ const ExperimentMetadata g_experiment_metadata[] = {
      false},
     {"unconstrained_max_quota_buffer_size",
      description_unconstrained_max_quota_buffer_size, false},
-    {"event_engine_client", description_event_engine_client,
-     ENABLE_EVENT_ENGINE},
+    {"event_engine_client", description_event_engine_client, false},
     {"monitoring_experiment", description_monitoring_experiment, true},
     {"promise_based_client_call", description_promise_based_client_call, false},
     {"free_large_allocator", description_free_large_allocator, false},
