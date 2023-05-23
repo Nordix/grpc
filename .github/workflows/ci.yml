@@ -1,0 +1,87 @@
+name: ci
+on:
+  push:
+  pull_request:
+
+# env:
+#   USE_BAZEL_VERSION: 5.4.0
+#   BAZEL_CXXOPTS: -std=c++14
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: True
+    # - uses: nttld/setup-ndk@v1
+    #   with:
+    #     ndk-version: r25c
+    # - name: ENV
+    #   run: |
+    #     env | grep ANDROID
+    - name: Build
+      env:
+        ANDROID_HOME: ""
+        ANDROID_NDK_HOME: ""
+        ANDROID_SDK_PATH: ""
+      run: |
+        bazel build :grpc_base
+        # bazel build //...
+        # bazel build :all
+  #   # - name: Prepare
+  #   #   env:
+  #   #     ANDROID_SDK_VERSION: 4333796
+  #   #   run: |
+  #   #     apt install -y wget apt-transport-https
+  #   #     mkdir -p /etc/apt/keyrings
+  #   #     wget -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | tee /etc/apt/keyrings/adoptium.asc
+  #   #     echo "deb [signed-by=/etc/apt/keyrings/adoptium.asc] https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list
+  #   #     cat /etc/apt/sources.list.d/adoptium.list
+  #   #     apt update && apt install -y temurin-8-jdk
+
+  #   #     mkdir -p /opt/android-sdk
+  #   #     cd /opt/android-sdk
+  #   #     wget -q https://dl.google.com/android/repository/sdk-tools-linux-$ANDROID_SDK_VERSION.zip
+  #   #     unzip -q sdk-tools-linux-$ANDROID_SDK_VERSION.zip
+  #   #     rm sdk-tools-linux-$ANDROID_SDK_VERSION.zip
+  #   #     echo yes | /opt/android-sdk/tools/bin/sdkmanager --licenses  # accept all licenses
+  #   - name: Test
+  #     # env:
+  #     #   ANDROID_SDK_PATH: /opt/android-sdk
+  #     #   ANDROID_HOME: /opt/android-sdk
+  #     run: |
+  #       bazel test --config=dbg //test/cpp/...
+  #       # bazel test //test/cpp/...
+  #       # bazel test //test/...
+
+  # macos:
+  #   runs-on: macos-latest
+  #   steps:
+  #   - uses: actions/checkout@v3
+  #     with:
+  #       submodules: recursive
+  #   # - name: Build
+  #   #   run: |
+  #   #     bazel version
+  #   #     bazel build --config=macos :all
+  #   - name: Test
+  #     run: |
+  #       bazel test --config=dbg //test/cpp/...
+
+  windows:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: True
+    # - uses: nttld/setup-ndk@v1
+    #   with:
+    #     ndk-version: r25c
+    - name: Test
+      env:
+        ANDROID_HOME: ""
+        ANDROID_NDK_HOME: ""
+        ANDROID_SDK_PATH: ""
+      run: |
+        bazel build :grpc_base
