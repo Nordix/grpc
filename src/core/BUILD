@@ -2103,6 +2103,12 @@ grpc_cc_library(
     hdrs = [
         "lib/event_engine/windows/windows_qos.h",
     ],
+    linkopts = select({
+        "//:windows": ["-Wl,qwave.lib"],
+        "//:windows_msvc": ["-Wl,qwave.lib"],
+        "//:windows_other": ["-Wl,qwave.lib"],
+        "//conditions:default": [],
+    }),
     deps = [
         "error",
         "//:event_engine_base_hdrs",
